@@ -1,6 +1,6 @@
 {
   "window.zoomLevel": 1,
-  "editor.fontSize": 12,
+  "editor.fontSize": 10,
   "editor.hover.enabled": true,
   "workbench.startupEditor": "none",
   "explorer.compactFolders": false,
