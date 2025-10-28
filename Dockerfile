@@ -1,4 +1,4 @@
-FROM python:3.11.3-alpine3.18
+FROM python:3.13.9-alpine3.22
 LABEL maintainer="mncjdev@gmail.com"
 
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -13,20 +13,18 @@ WORKDIR /djangoapp
 EXPOSE 8000
 
 RUN python -m venv /venv && \
-  /venv/bin/pip install --upgrade pip && \
-  /venv/bin/pip install -r /djangoapp/requirements.txt && \
-  addusser --disabled-password --no-create-home duser && \
-  mkdir -p /data/web/static && \
-  mkdir -p /data/web/media && \
-  chown -R duser:duser /venv && \
-  chown -R duser:duser /data/web/static && \
-  chown -R duser:duser /data/web/media && \
-  chown -R 755 /data/web/static && \
-  chown -R 755 /data/web/media && \
-  chmod -R +x /scripts
+    /venv/bin/pip install --upgrade pip && \
+    /venv/bin/pip install -r /djangoapp/requirements.txt && \
+    # Criar usuário sem home (Alpine: adduser -D -H) e diretórios para static/media
+    adduser -D -H duser && \
+    mkdir -p /data/web/static /data/web/media && \
+    # Ajustar permissões e propriedade
+    chown -R duser:duser /venv /data/web/static /data/web/media && \
+    chmod -R 755 /data/web/static /data/web/media && \
+    chmod -R +x /scripts
 
-  ENV PATH="/scripts:/venv/bin:$PATH"
+# Colocar scripts e venv no PATH
+ENV PATH="/scripts:/venv/bin:$PATH"
 
-  USER duser
-
-  CMD [ "commands.sh" ]
+# Executar o script de inicialização do container (arquivo em /scripts/commands.sh)
+CMD ["/scripts/commands.sh"]
