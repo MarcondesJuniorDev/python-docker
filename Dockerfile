@@ -15,8 +15,8 @@ EXPOSE 8000
 RUN python -m venv /venv && \
     /venv/bin/pip install --upgrade pip && \
     /venv/bin/pip install -r /djangoapp/requirements.txt && \
-    # Criar usuário sem home (Alpine: adduser -D -H) e diretórios para static/media
-    adduser -D -H duser && \
+    # Criar usuário duser com UID/GID 1000 (mesmo do host) para evitar problemas de permissão
+    adduser -D -H -u 1000 duser && \
     mkdir -p /data/web/static /data/web/media && \
     # Ajustar permissões e propriedade
     chown -R duser:duser /venv /data/web/static /data/web/media && \
@@ -25,6 +25,9 @@ RUN python -m venv /venv && \
 
 # Colocar scripts e venv no PATH
 ENV PATH="/scripts:/venv/bin:$PATH"
+
+# Usar usuário não-root com mesmo UID do host
+USER duser
 
 # Executar o script de inicialização do container (arquivo em /scripts/commands.sh)
 CMD ["/scripts/commands.sh"]
